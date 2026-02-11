@@ -27,9 +27,7 @@ def load_config() -> Config:
     
     Raises 'InvalidConfigError' when an invalid config is given.
     """
-    dotenv_filepath:Path = get_dotenv_filepath()
-    logger.debug(f"Using dotenv-filepath '{dotenv_filepath.absolute()}'")
-    load_dotenv(dotenv_path=dotenv_filepath, override=True)
+    load_dotenv(dotenv_path=get_dotenv_filepath(), override=True)
     
     #
     # NTFY
@@ -48,6 +46,9 @@ def load_config() -> Config:
         ntfy_http_request_timeout:int = int(os.getenv('NTFY_HTTP_REQUEST_TIMEOUT', '10'))
     except ValueError as _e:
         raise InvalidConfigError("Got an invalid 'NTFY_HTTP_REQUEST_TIMEOUT'! Must be an integer.") from _e
+    
+    if ntfy_http_request_timeout < 0:
+        raise InvalidConfigError("'NTFY_HTTP_REQUEST_TIMEOUT' must be >= 0")
     
     try:
         min_hz_alert_threshold:float = float(os.getenv('MIN_HZ_ALERT_THRESHOLD', "49.95"))
@@ -73,6 +74,9 @@ def load_config() -> Config:
         api_http_request_timeout:int = int(os.getenv('API_HTTP_REQUEST_TIMEOUT', '10'))
     except ValueError as _e:
         raise InvalidConfigError("Got an invalid 'API_HTTP_REQUEST_TIMEOUT'! Must be an integer.") from _e
+    
+    if api_http_request_timeout < 0:
+        raise InvalidConfigError("'API_HTTP_REQUEST_TIMEOUT' must be >= 0")
     
     return Config(
         enable_ntfy=enable_ntfy,

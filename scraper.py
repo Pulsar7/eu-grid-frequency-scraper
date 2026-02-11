@@ -11,6 +11,7 @@ import time
 import logging
 import argparse
 #
+import src.utils as utils
 from src.api import APIHandler
 from src.ntfy import NTFYHandler
 from src.custom_exceptions import *
@@ -96,6 +97,7 @@ if __name__ == '__main__':
     logger:logging.Logger = logging.getLogger(__name__)
     
     try:
+        logger.debug(f"Using dotenv-filepath '{utils.get_dotenv_filepath().absolute()}'")
         config:Config = load_config()
     except ConfigError:
         logger.exception("Got invalid configuration.")

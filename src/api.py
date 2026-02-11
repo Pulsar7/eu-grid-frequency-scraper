@@ -19,7 +19,7 @@ class APIHandler:
     def requests_timeout(self) -> int:
         return self._requests_timeout
     
-    def get_api_data(self) -> tuple[str,str]:
+    def get_api_data(self) -> tuple[float, str]:
         """
         Get data from Netzfrequenz-XML-API.
         
@@ -48,9 +48,14 @@ class APIHandler:
                 frequency = api_data.find('f').text
                 timestamp = api_data.find('z').text
                 self.logger.debug(f"Received data from API: {api_data}")
-                self.logger.debug(f"Successfully parsed frequency={frequency} and timestamp={timestamp} from XML-API data")
+                self.logger.debug(f"Got frequency={frequency} and timestamp={timestamp} from XML-API data")
             except Exception as _e:
                 raise APIError("Couldn't parse API-XML-data") from _e
+            
+            try:
+                frequency:float = float(frequency)
+            except ValueError as _e:
+                raise APIError("Got invalid frequency!") from _e
             
             return (frequency, timestamp)
             
