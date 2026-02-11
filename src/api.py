@@ -41,7 +41,7 @@ class APIHandler:
                 raise APIError(err_msg)
             
             self.logger.debug(f"Got response.status_code={response.status_code} from '{self._api_url}'")
-            self.logger.info(f"Got {len(response.content)} Bytes of data from API")
+            self.logger.debug(f"Got {len(response.content)} Bytes of data from API")
             
             try:
                 api_data = ET.fromstring(response.content)
