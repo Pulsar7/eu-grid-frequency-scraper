@@ -3,7 +3,7 @@
     EU Grid frequency scraper and notifier.
 
     # Script-Version: 1.0
-    # Python-Version: 3.12.7
+    # Python-Version: 3.10.12
 
 """
 import os
