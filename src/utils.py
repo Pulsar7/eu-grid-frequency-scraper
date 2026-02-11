@@ -1,4 +1,3 @@
-import requests
 from pathlib import Path
 
 def get_dotenv_filepath() -> Path:
