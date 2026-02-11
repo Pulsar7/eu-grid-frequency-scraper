@@ -14,20 +14,21 @@ import argparse
 from src.api import APIHandler
 from src.ntfy import NTFYHandler
 from src.custom_exceptions import *
+from src.config import load_config, Config
 from src.logger_config import configure_logger
 
 def main() -> None:
-    if config.ENABLE_NTFY:
+    if config.enable_ntfy:
         ntfy = NTFYHandler(
-            topic_url=config.NTFY_TOPIC_URL,
-            auth_token=config.NTFY_AUTH_TOKEN,
-            requests_timeout=config.HTTP_REQUEST_TIMEOUT
+            topic_url=config.ntfy_topic_url,
+            auth_token=config.ntfy_auth_token,
+            requests_timeout=config.http_request_timeout
         )
         logger.debug(f"Using NTFY '{ntfy.topic_url}' for notifications")
     else:
         logger.warning("NTFY is disabled.")
     
-    if args.test_ntfy and config.ENABLE_NTFY:
+    if args.test_ntfy and config.enable_ntfy:
         logger.info("Test NTFY-configuration and exit.")
         if not ntfy.test_config():
             logger.critical("Your current NTFY-configuration failed.")
@@ -35,13 +36,13 @@ def main() -> None:
         else:
             logger.info("Your current NTFY-configuration seems fine.")
             quit(0)
-    elif args.test_ntfy and not config.ENABLE_NTFY:
+    elif args.test_ntfy and not config.enable_ntfy:
         logger.critical("Cannot test NTFY-configuration, when NTFY is disabled!")
         quit(1)
         
     apihandler = APIHandler(
-        api_url=config.NETZFREQUENZ_DE_API_URL,
-        requests_timeout=config.HTTP_REQUEST_TIMEOUT
+        api_url=config.api_url,
+        requests_timeout=config.http_request_timeout
     )
     
     try:
@@ -54,7 +55,7 @@ def main() -> None:
 
     if frequency < config.min_hz_alert_threshold:
         logger.info(f"[EVENT] Grid frequency is below MIN-threshold (< {config.min_hz_alert_threshold}Hz)")
-        if config.ENABLE_NTFY:
+        if config.enable_ntfy:
             ntfy.send_notification(
                 title="FREQUENCY BELOW THRESHOLD",
                 message=f"Grid frequency is below MIN-threshold (< {config.min_hz_alert_threshold}Hz)\n\n> Frequency={frequency}\n> Timestamp={timestamp}",
@@ -64,7 +65,7 @@ def main() -> None:
     
     elif frequency > config.max_hz_alert_threshold:
         logger.info(f"[EVENT] Grid frequency is above MAX-threshold (< {config.max_hz_alert_threshold}Hz)")
-        if config.ENABLE_NTFY:
+        if config.enable_ntfy:
             ntfy.send_notification(
                 title="FREQUENCY ABOVE THRESHOLD",
                 message=f"Grid frequency is above MAX-threshold (> {config.max_hz_alert_threshold}Hz)\n\n> Frequency={frequency}\n> Timestamp={timestamp}",
@@ -95,7 +96,7 @@ if __name__ == '__main__':
     logger:logging.Logger = logging.getLogger(__name__)
     
     try:
-        import src.config as config
+        config:Config = load_config()
     except ConfigError:
         logger.exception("Got invalid configuration.")
         quit(1)
