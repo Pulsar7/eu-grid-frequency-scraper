@@ -59,6 +59,9 @@ def load_config() -> Config:
     except ValueError as _e:
         raise InvalidConfigError("Got an invalid 'MAX_HZ_ALERT_THRESHOLD'! Must be a float.") from _e
 
+    if min_hz_alert_threshold >= max_hz_alert_threshold:
+        raise InvalidConfigError("'MIN_HZ_ALERT_THRESHOLD' needs to be lower than 'MAX_HZ_ALERT_THRESHOLD'!")
+
     #
     # API
     #
