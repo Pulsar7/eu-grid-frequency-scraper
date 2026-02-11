@@ -14,10 +14,11 @@ class Config:
     enable_ntfy: bool
     ntfy_topic_url: str | None
     ntfy_auth_token: str | None
+    ntfy_http_request_timeout:int 
     min_hz_alert_threshold: float
     max_hz_alert_threshold: float
     api_url: str
-    http_request_timeout: int
+    api_http_request_timeout: int
     
 
 def load_config() -> Config:
@@ -44,6 +45,11 @@ def load_config() -> Config:
         raise InvalidConfigError("Missing 'NTFY_AUTH_TOKEN', when 'ENABLE_NTFY' is true!")
     
     try:
+        ntfy_http_request_timeout:int = int(os.getenv('NTFY_HTTP_REQUEST_TIMEOUT', '10'))
+    except ValueError as _e:
+        raise InvalidConfigError("Got an invalid 'NTFY_HTTP_REQUEST_TIMEOUT'! Must be an integer.") from _e
+    
+    try:
         min_hz_alert_threshold:float = float(os.getenv('MIN_HZ_ALERT_THRESHOLD', "49.95"))
     except ValueError as _e:
         raise InvalidConfigError("Got an invalid 'MIN_HZ_ALERT_THRESHOLD'! Must be a float.") from _e
@@ -60,22 +66,18 @@ def load_config() -> Config:
     if not api_url:
         raise InvalidConfigError("Missing 'NETZFREQUENZ_DE_API_URL'!")
     
-    
-    #
-    # HTTP-requests
-    #
     try:
-        http_request_timeout:int = int(os.getenv('HTTP_REQUEST_TIMEOUT', '10'))
+        api_http_request_timeout:int = int(os.getenv('API_HTTP_REQUEST_TIMEOUT', '10'))
     except ValueError as _e:
-        raise InvalidConfigError("Got an invalid 'HTTP_REQUEST_TIMEOUT'! Must be an integer.") from _e
-    
+        raise InvalidConfigError("Got an invalid 'API_HTTP_REQUEST_TIMEOUT'! Must be an integer.") from _e
     
     return Config(
         enable_ntfy=enable_ntfy,
         ntfy_topic_url=ntfy_topic_url,
         ntfy_auth_token=ntfy_auth_token,
+        ntfy_http_request_timeout=ntfy_http_request_timeout,
         min_hz_alert_threshold=min_hz_alert_threshold,
         max_hz_alert_threshold=max_hz_alert_threshold,
         api_url=api_url,
-        http_request_timeout=http_request_timeout
+        api_http_request_timeout=api_http_request_timeout
     )

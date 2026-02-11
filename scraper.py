@@ -22,7 +22,7 @@ def main() -> None:
         ntfy = NTFYHandler(
             topic_url=config.ntfy_topic_url,
             auth_token=config.ntfy_auth_token,
-            requests_timeout=config.http_request_timeout
+            requests_timeout=config.ntfy_http_request_timeout
         )
         logger.debug(f"Using NTFY '{ntfy.topic_url}' for notifications")
     else:
@@ -42,7 +42,7 @@ def main() -> None:
         
     apihandler = APIHandler(
         api_url=config.api_url,
-        requests_timeout=config.http_request_timeout
+        requests_timeout=config.api_http_request_timeout
     )
     
     try:
