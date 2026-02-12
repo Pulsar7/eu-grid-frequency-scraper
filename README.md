@@ -1,7 +1,7 @@
 <h1>eu-grid-frequency-scraper</h1>
 
 > [!IMPORTANT]
-> The script only uses one source of information and depends on a functioning internet-connection.
+> The script only uses one source of information.
 
 A simple Python script, that scrapes the current frequency of the **EU-Grid** from this **API**: [https://dat.netzfrequenzmessung.de:9080/frequenz.xml](https://dat.netzfrequenzmessung.de:9080/frequenz.xml).
 It sends alert-messages of two different types (**WARNING** or **CRITICAL**) when the parsed frequency has been reached or exceeded the configured thresholds.
