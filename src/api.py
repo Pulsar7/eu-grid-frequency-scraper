@@ -37,41 +37,40 @@ class APIHandler:
         
         Raises `APIError` if failed.
         """
+        # Get data
         try:
-            response = requests.get(url=self._api_url, verify=self.requests_cert_verify,
-                                    timeout=self.requests_timeout)
-            if response.status_code != 200:
-                err_msg:str = f"Got an invalid response code ('{response.status_code}') from API!"
-                # TODO: Limit exceeded warn-message
-                raise APIError(err_msg)
+            response = requests.get(
+                url=self.api_url, 
+                verify=self.requests_cert_verify,
+                timeout=self.requests_timeout
+            )
+            response.raise_for_status()
             
-            self.logger.debug(f"Got response.status_code={response.status_code} from '{self._api_url}'")
-            self.logger.debug(f"Got {len(response.content)} Bytes of data from API")
-            
-            try:
-                api_data = ET.fromstring(response.content)
-                frequency = api_data.find('f').text
-                timestamp = api_data.find('z').text
-                self.logger.debug(f"Received data from API: {api_data}")
-                self.logger.debug(f"Got frequency={frequency} and timestamp={timestamp} from XML-API data")
-            except Exception as _e:
-                raise APIError("Couldn't parse API-XML-data") from _e
-            
-            try:
-                frequency:float = float(frequency)
-            except ValueError as _e:
-                raise APIError("Got invalid frequency!") from _e
-            
-            return (frequency, timestamp)
-            
-        except requests.ConnectionError as _e:
-            raise APIError("API Connection Error!") from _e
+            self.logger.debug(f"Got response.status_code={response.status_code} from '{self.api_url}', "
+                              f"{len(response.content)} bytes")
         
-        except requests.ConnectTimeout as _e:
-            err_msg:str = f"API Connection Timeout"
-            if self.requests_timeout <= 3:
-                err_msg += " (Your request-timeout may be too low)"
-            raise APIError(err_msg) from _e
+        except requests.RequestException as _e:
+            raise APIError("API request-error") from _e
+        
+        # Parse XML-data
+        try:
+            api_data = ET.fromstring(response.content)
+        except ET.ParseError as _e:
+            raise APIError("Couldn't parse API XML-data") from _e
+        frequency:str|None = api_data.findtext('f')
+        timestamp:str|None = api_data.findtext('z')
+        if frequency is None or timestamp is None:
+            self.logger.debug(f"Received XML-data: {response.content}")
+            raise APIError("API XML-data doesn't contain expected keys")
 
-        except Exception as _e:
-            raise APIError("An unexpected error occured") from _e
+        self.logger.debug(f"Received data from API: {api_data}, "
+                            f"parsed frequency={frequency} and timestamp={timestamp} from XML-API data")
+
+        try:
+            frequency:float = float(frequency)
+        except ValueError as _e:
+            raise APIError("Invalid frequency value") from _e
+        
+        return (frequency, timestamp)
+        
+        
