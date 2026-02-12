@@ -73,3 +73,18 @@ def test_invalid_hz_threshold_max_below_min(monkeypatch) -> None:
     #
     with pytest.raises(InvalidConfigError):
         load_config() 
+
+def test_invalid_hz_threshold_max_equals_min(monkeypatch) -> None:
+    """
+    Test invalid `MIN_HZ_ALERT_THRESHOLD` and `MAX_HZ_ALERT_THRESHOLD`
+    
+    - `MAX_HZ_ALERT_THRESHOLD` equals `MIN_HZ_ALERT_THRESHOLD`
+    """
+    monkeypatch.setenv("NETZFREQUENZ_DE_API_URL", "https://netzfrequenz.localhost")
+    #
+    # `MAX_HZ_ALERT_THRESHOLD` equals `MIN_HZ_ALERT_THRESHOLD`
+    monkeypatch.setenv("MIN_HZ_ALERT_THRESHOLD", "30.33")
+    monkeypatch.setenv("MAX_HZ_ALERT_THRESHOLD", "30.33")
+    #
+    with pytest.raises(InvalidConfigError):
+        load_config()
