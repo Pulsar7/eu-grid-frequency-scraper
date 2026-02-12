@@ -22,13 +22,15 @@ def send_alert(level:str, min_or_max:str, frequency:float, threshold:float, time
     """
     Log and send NTFY alert if NTFY is enabled.
     """
-    msg:str = f"{level.upper()}: Grid frequency {'reached' if frequency == threshold else 'is below'} {level.lower()}-{min_or_max.upper()}-threshold ({'<=' if min_or_max.lower() == 'min' else '>='} {threshold}Hz)"
+    direction:str = "LOW" if min_or_max.lower() == "min" else "HIGH"
+    breach_type:str = "fell below" if direction == "LOW" else "exceeded"
+    msg:str = f"Grid frequency has {breach_type} the {level.lower()} {direction} threshold."
     logger.info(f"[EVENT] {msg}")
     if config.enable_ntfy:
         try:
             ntfy.send_notification(
-                title=f"{'REACHED' if frequency == threshold else 'BELOW'} {level.upper()} {min_or_max.upper()}-THRESHOLD",
-                message=f"{msg}\n\n> Frequency={frequency}Hz\n> Timestamp={timestamp}",
+                title=f"{level.upper()} - Grid Frequency {direction} Threshold {breach_type.upper()}",
+                message=f"{msg}\n\n>Threshold={threshold}Hz\n> Current Frequency={frequency}Hz\n> Timestamp={timestamp}",
                 priority="urgent" if level.upper() == "CRITICAL" else "high",
                 tags="rotating_light" if level.upper() == "CRITICAL" else "warning"
             )
@@ -41,11 +43,23 @@ def send_alert(level:str, min_or_max:str, frequency:float, threshold:float, time
 def check_frequency_thresholds(frequency:float, timestamp:str, ntfy:None|NTFYHandler) -> None:
     """
     Check if MIN-Hz or MAX-Hz WARNING/CRITICAL frequency thresholds have been reached.
+    
+    The threshold model is structured as two nested ranges:
+
+        CRITICAL MIN  <  WARNING MIN  <  NOMINAL (50 Hz)  <  WARNING MAX  <  CRITICAL MAX
+
+    - The inner range defines the WARNING thresholds. Crossing this range indicates abnormal frequency deviation.
+
+    - The outer range defines the CRITICAL thresholds. Crossing this range indicates severe grid instability.
+
+    In short:
+        Inner bracket -> WARNING  (early deviation)
+        Outer bracket -> CRITICAL (serious deviation)
     """
     #
     # CRITICAL
     #
-    if frequency <= config.critical_min_hz_alert_threshold:
+    if frequency < config.critical_min_hz_alert_threshold:
         if not send_alert(
                 level="CRITICAL",
                 min_or_max="MIN",
@@ -57,7 +71,7 @@ def check_frequency_thresholds(frequency:float, timestamp:str, ntfy:None|NTFYHan
             logger.critical("Couldn't send alert!")
             quit(1)
     
-    elif frequency >= config.critical_max_hz_alert_threshold:
+    elif frequency > config.critical_max_hz_alert_threshold:
         if not send_alert(
                 level="CRITICAL",
                 min_or_max="MAX",
