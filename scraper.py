@@ -29,7 +29,7 @@ def send_alert(level:str, min_or_max:str, frequency:float, threshold:float, time
             ntfy.send_notification(
                 title=f"{'REACHED' if frequency == threshold else 'BELOW'} {level.upper()} {min_or_max.upper()}-THRESHOLD",
                 message=f"{msg}\n\n> Frequency={frequency}Hz\n> Timestamp={timestamp}",
-                priority="urgent",
+                priority="urgent" if level.upper() == "CRITICAL" else "high",
                 tags="rotating_light" if level.upper() == "CRITICAL" else "warning"
             )
         except NTFYError:
