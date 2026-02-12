@@ -1,5 +1,6 @@
 import sys
 import logging
+import requests
 
 def configure_logger(log_level:str) -> None:
     """
@@ -19,3 +20,6 @@ def configure_logger(log_level:str) -> None:
         handlers=handlers,
         datefmt="%Y-%m-%dT%H:%M:%S%z"
     )
+    
+    # Surpress requests TLS-warnings
+    requests.packages.urllib3.disable_warnings()

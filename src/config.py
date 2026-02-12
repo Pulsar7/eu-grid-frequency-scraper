@@ -13,11 +13,13 @@ class Config:
     enable_ntfy: bool
     ntfy_topic_url: str | None
     ntfy_auth_token: str | None
-    ntfy_http_request_timeout:int 
+    ntfy_http_request_timeout:int
+    ntfy_http_request_cert_verify: bool
     min_hz_alert_threshold: float
     max_hz_alert_threshold: float
     api_url: str
     api_http_request_timeout: int
+    api_http_request_cert_verify: bool
     
 
 def load_config() -> Config:
@@ -49,6 +51,8 @@ def load_config() -> Config:
     if ntfy_http_request_timeout < 0:
         raise InvalidConfigError("'NTFY_HTTP_REQUEST_TIMEOUT' must be >= 0")
     
+    ntfy_http_request_cert_verify:bool = os.getenv('NTFY_HTTP_REQUEST_CERT_VERIFY', 'false').strip().upper() == "TRUE"
+    
     try:
         min_hz_alert_threshold:float = float(os.getenv('MIN_HZ_ALERT_THRESHOLD', "49.95"))
     except ValueError as _e:
@@ -77,13 +81,17 @@ def load_config() -> Config:
     if api_http_request_timeout < 0:
         raise InvalidConfigError("'API_HTTP_REQUEST_TIMEOUT' must be >= 0")
     
+    api_http_request_cert_verify:bool = os.getenv('API_HTTP_REQUEST_CERT_VERIFY', 'true').strip().upper() == "TRUE"
+    
     return Config(
         enable_ntfy=enable_ntfy,
         ntfy_topic_url=ntfy_topic_url,
         ntfy_auth_token=ntfy_auth_token,
         ntfy_http_request_timeout=ntfy_http_request_timeout,
+        ntfy_http_request_cert_verify=ntfy_http_request_cert_verify,
         min_hz_alert_threshold=min_hz_alert_threshold,
         max_hz_alert_threshold=max_hz_alert_threshold,
         api_url=api_url,
-        api_http_request_timeout=api_http_request_timeout
+        api_http_request_timeout=api_http_request_timeout,
+        api_http_request_cert_verify=api_http_request_cert_verify
     )

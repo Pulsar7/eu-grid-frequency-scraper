@@ -5,11 +5,12 @@ import xml.etree.ElementTree as ET
 from src.custom_exceptions import APIError
 
 class APIHandler:
-    def __init__(self, api_url:str, requests_timeout:int) -> None:
+    def __init__(self, api_url:str, requests_timeout:int, requests_cert_verify:bool) -> None:
         self.logger:logging.Logger = logging.getLogger(__class__.__name__)
         #
         self._api_url:str = api_url
         self._requests_timeout:int = requests_timeout
+        self._requests_cert_verify:bool = requests_cert_verify
         
     @property
     def api_url(self) -> str:
@@ -18,6 +19,10 @@ class APIHandler:
     @property
     def requests_timeout(self) -> int:
         return self._requests_timeout
+    
+    @property
+    def requests_cert_verify(self) -> bool:
+        return self._requests_cert_verify
     
     def get_api_data(self) -> tuple[float, str]:
         """
@@ -33,7 +38,7 @@ class APIHandler:
         Raises `APIError` if failed.
         """
         try:
-            response = requests.get(url=self._api_url, verify=True,
+            response = requests.get(url=self._api_url, verify=self.requests_cert_verify,
                                     timeout=self.requests_timeout)
             if response.status_code != 200:
                 err_msg:str = f"Got an invalid response code ('{response.status_code}') from API!"

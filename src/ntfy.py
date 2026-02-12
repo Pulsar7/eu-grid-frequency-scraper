@@ -4,12 +4,13 @@ import logging
 from src.custom_exceptions import NTFYError
 
 class NTFYHandler:
-    def __init__(self, topic_url:str, auth_token:str, requests_timeout:int) -> None:
-        self.logger = logging.getLogger(__class__.__name__)
+    def __init__(self, topic_url:str, auth_token:str, requests_timeout:int, requests_cert_verify:bool) -> None:
+        self.logger:logging.Logger = logging.getLogger(__class__.__name__)
         #
         self._topic_url:str = topic_url
         self._auth_token:str = auth_token
         self._requests_timeout:int = requests_timeout
+        self._requests_cert_verify:bool = requests_cert_verify
     
     @property
     def topic_url(self) -> str:
@@ -22,6 +23,10 @@ class NTFYHandler:
     @property
     def requests_timeout(self) -> int:
         return self._requests_timeout
+    
+    @property
+    def requests_cert_verify(self) -> bool:
+        return self._requests_cert_verify
     
     def send_notification(self, title:str, message:str, priority:str, tags:str) -> bool:
         """
@@ -38,7 +43,7 @@ class NTFYHandler:
                 url=self.topic_url,
                 data=message,
                 headers=headers,
-                verify=False,
+                verify=self.requests_cert_verify,
                 timeout=self.requests_timeout
             )
             if response.status_code != 200:
@@ -46,6 +51,8 @@ class NTFYHandler:
                 if response.status_code == 401:
                     err_msg += " (Looks like the authentication-token is incorrect)"
                 raise NTFYError(err_msg)
+            
+            self.logger.debug(f"Sent out alert to '{self.topic_url}' with HTTP-response-code={response.status_code}")
             
             return True
             

@@ -18,12 +18,38 @@ from src.custom_exceptions import *
 from src.config import load_config, Config
 from src.logger_config import configure_logger
 
+def check_frequency_thresholds(frequency:float, timestamp:str, ntfy:None|NTFYHandler) -> None:
+    """
+    Check and send alert if MIN-Hz or MAX-Hz frequency threshold has been reached and NTFY is enabled.
+    """
+    if frequency <= config.min_hz_alert_threshold:
+        logger.info(f"[EVENT] Grid frequency is below MIN-threshold (< {config.min_hz_alert_threshold}Hz)")
+        if config.enable_ntfy:
+            ntfy.send_notification(
+                title="FREQUENCY BELOW THRESHOLD",
+                message=f"Grid frequency is below MIN-threshold (< {config.min_hz_alert_threshold}Hz)\n\n> Frequency={frequency}\n> Timestamp={timestamp}",
+                priority="urgent", # max
+                tags="warning"
+            )
+    
+    elif frequency >= config.max_hz_alert_threshold:
+        logger.info(f"[EVENT] Grid frequency is above MAX-threshold (< {config.max_hz_alert_threshold}Hz)")
+        if config.enable_ntfy:
+            ntfy.send_notification(
+                title="FREQUENCY ABOVE THRESHOLD",
+                message=f"Grid frequency is above MAX-threshold (> {config.max_hz_alert_threshold}Hz)\n\n> Frequency={frequency}\n> Timestamp={timestamp}",
+                priority="urgent", # max
+                tags="warning"
+            )
+
 def main() -> None:
+    ntfy = None
     if config.enable_ntfy:
         ntfy = NTFYHandler(
             topic_url=config.ntfy_topic_url,
             auth_token=config.ntfy_auth_token,
-            requests_timeout=config.ntfy_http_request_timeout
+            requests_timeout=config.ntfy_http_request_timeout,
+            requests_cert_verify=config.ntfy_http_request_cert_verify
         )
         logger.debug(f"Using NTFY '{ntfy.topic_url}' for notifications")
     else:
@@ -43,7 +69,8 @@ def main() -> None:
         
     apihandler = APIHandler(
         api_url=config.api_url,
-        requests_timeout=config.api_http_request_timeout
+        requests_timeout=config.api_http_request_timeout,
+        requests_cert_verify=config.api_http_request_cert_verify
     )
     
     try:
@@ -54,26 +81,7 @@ def main() -> None:
     
     logger.info(f"Frequency={frequency} | Timestamp={timestamp}")
 
-    if frequency < config.min_hz_alert_threshold:
-        logger.info(f"[EVENT] Grid frequency is below MIN-threshold (< {config.min_hz_alert_threshold}Hz)")
-        if config.enable_ntfy:
-            ntfy.send_notification(
-                title="FREQUENCY BELOW THRESHOLD",
-                message=f"Grid frequency is below MIN-threshold (< {config.min_hz_alert_threshold}Hz)\n\n> Frequency={frequency}\n> Timestamp={timestamp}",
-                priority="urgent", # max
-                tags="warning"
-            )
-    
-    elif frequency > config.max_hz_alert_threshold:
-        logger.info(f"[EVENT] Grid frequency is above MAX-threshold (< {config.max_hz_alert_threshold}Hz)")
-        if config.enable_ntfy:
-            ntfy.send_notification(
-                title="FREQUENCY ABOVE THRESHOLD",
-                message=f"Grid frequency is above MAX-threshold (> {config.max_hz_alert_threshold}Hz)\n\n> Frequency={frequency}\n> Timestamp={timestamp}",
-                priority="urgent", # max
-                tags="warning"
-            )
-    
+    check_frequency_thresholds(frequency, timestamp, ntfy)
     
     logger.debug(f"Runtime={time.time()-_start} seconds")
 
