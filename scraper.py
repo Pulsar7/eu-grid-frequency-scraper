@@ -22,7 +22,7 @@ def send_alert(level:str, min_or_max:str, frequency:float, threshold:float, time
     """
     Log and send NTFY alert if NTFY is enabled.
     """
-    msg:str = f"{level.upper()}: Grid frequency {'reached' if frequency == threshold else 'is below'} {min_or_max.upper()}-threshold ({'<=' if min_or_max.lower() == 'min' else '>='} {threshold}Hz)"
+    msg:str = f"{level.upper()}: Grid frequency {'reached' if frequency == threshold else 'is below'} {level.lower()}-{min_or_max.upper()}-threshold ({'<=' if min_or_max.lower() == 'min' else '>='} {threshold}Hz)"
     logger.info(f"[EVENT] {msg}")
     if config.enable_ntfy:
         try:
