@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from dataclasses import dataclass
 #
 from src.utils import get_dotenv_filepath
-from src.custom_exceptions import InvalidConfigError
+from src.custom_exceptions import InvalidConfigError, InvalidMaxMinThresholdError
 
 logger:logging.Logger = logging.getLogger(__name__)
 
@@ -15,8 +15,10 @@ class Config:
     ntfy_auth_token: str | None
     ntfy_http_request_timeout:int
     ntfy_http_request_cert_verify: bool
-    min_hz_alert_threshold: float
-    max_hz_alert_threshold: float
+    warning_min_hz_alert_threshold: float
+    warning_max_hz_alert_threshold: float
+    critical_min_hz_alert_threshold: float
+    critical_max_hz_alert_threshold: float
     api_url: str
     api_http_request_timeout: int
     api_http_request_cert_verify: bool
@@ -26,7 +28,7 @@ def load_config() -> Config:
     """
     Load configuration of dotenv-file into dataclass-object.
     
-    Raises 'InvalidConfigError' when an invalid config is given.
+    Raises `InvalidConfigError` when an invalid config is given.
     """
     load_dotenv(dotenv_path=get_dotenv_filepath(), override=True)
     
@@ -54,17 +56,36 @@ def load_config() -> Config:
     ntfy_http_request_cert_verify:bool = os.getenv('NTFY_HTTP_REQUEST_CERT_VERIFY', 'false').strip().upper() == "TRUE"
     
     try:
-        min_hz_alert_threshold:float = float(os.getenv('MIN_HZ_ALERT_THRESHOLD', "49.95"))
+        warning_min_hz_alert_threshold:float = float(os.getenv('WARNING_MIN_HZ_ALERT_THRESHOLD', "49.850"))
     except ValueError as _e:
-        raise InvalidConfigError("Got an invalid 'MIN_HZ_ALERT_THRESHOLD'! Must be a float.") from _e
+        raise InvalidMaxMinThresholdError("Got an invalid 'WARNING_MIN_HZ_ALERT_THRESHOLD'! Must be a float.") from _e
     
     try:
-        max_hz_alert_threshold:float = float(os.getenv('MAX_HZ_ALERT_THRESHOLD', "50.05"))
+        warning_max_hz_alert_threshold:float = float(os.getenv('WARNING_MAX_HZ_ALERT_THRESHOLD', "50.150"))
     except ValueError as _e:
-        raise InvalidConfigError("Got an invalid 'MAX_HZ_ALERT_THRESHOLD'! Must be a float.") from _e
+        raise InvalidMaxMinThresholdError("Got an invalid 'WARNING_MAX_HZ_ALERT_THRESHOLD'! Must be a float.") from _e
 
-    if min_hz_alert_threshold >= max_hz_alert_threshold:
-        raise InvalidConfigError("'MIN_HZ_ALERT_THRESHOLD' needs to be lower than 'MAX_HZ_ALERT_THRESHOLD'!")
+    if warning_min_hz_alert_threshold >= warning_max_hz_alert_threshold:
+        raise InvalidMaxMinThresholdError("'WARNING_MIN_HZ_ALERT_THRESHOLD' needs to be lower than 'WARNING_MAX_HZ_ALERT_THRESHOLD'!")
+    
+    try:
+        critical_min_hz_alert_threshold:float = float(os.getenv('CRITICAL_MIN_HZ_ALERT_THRESHOLD', "49.600"))
+    except ValueError as _e:
+        raise InvalidMaxMinThresholdError("Got an invalid 'CRITICAL_MIN_HZ_ALERT_THRESHOLD'! Must be a float.") from _e
+    
+    try:
+        critical_max_hz_alert_threshold:float = float(os.getenv('CRITICAL_MAX_HZ_ALERT_THRESHOLD', "50.400"))
+    except ValueError as _e:
+        raise InvalidMaxMinThresholdError("Got an invalid 'CRITICAL_MAX_HZ_ALERT_THRESHOLD'! Must be a float.") from _e
+
+    if critical_min_hz_alert_threshold >= warning_min_hz_alert_threshold:
+        raise InvalidMaxMinThresholdError("'CRITICAL_MIN_HZ_ALERT_THRESHOLD' needs to be lower than 'WARNING_MIN_HZ_ALERT_THRESHOLD'")
+
+    if critical_max_hz_alert_threshold <= warning_max_hz_alert_threshold:
+        raise InvalidMaxMinThresholdError("'CRITICAL_MAX_HZ_ALERT_THRESHOLD' needs to be bigger than 'WARNING_MAX_HZ_ALERT_THRESHOLD'")
+
+    if critical_min_hz_alert_threshold >= critical_max_hz_alert_threshold:
+        raise InvalidMaxMinThresholdError("'CRITICAL_MIN_HZ_ALERT_THRESHOLD' needs to be lower than 'CRITICAL_MAX_HZ_ALERT_THRESHOLD'!")
 
     #
     # API
@@ -89,8 +110,10 @@ def load_config() -> Config:
         ntfy_auth_token=ntfy_auth_token,
         ntfy_http_request_timeout=ntfy_http_request_timeout,
         ntfy_http_request_cert_verify=ntfy_http_request_cert_verify,
-        min_hz_alert_threshold=min_hz_alert_threshold,
-        max_hz_alert_threshold=max_hz_alert_threshold,
+        warning_min_hz_alert_threshold=warning_min_hz_alert_threshold,
+        warning_max_hz_alert_threshold=warning_max_hz_alert_threshold,
+        critical_min_hz_alert_threshold=critical_min_hz_alert_threshold,
+        critical_max_hz_alert_threshold=critical_max_hz_alert_threshold,
         api_url=api_url,
         api_http_request_timeout=api_http_request_timeout,
         api_http_request_cert_verify=api_http_request_cert_verify

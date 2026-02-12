@@ -18,33 +18,83 @@ from src.custom_exceptions import *
 from src.config import load_config, Config
 from src.logger_config import configure_logger
 
+def send_alert(level:str, min_or_max:str, frequency:float, threshold:float, timestamp:str, ntfy:None|NTFYHandler) -> bool:
+    """
+    Log and send NTFY alert if NTFY is enabled.
+    """
+    msg:str = f"{level.upper()}: Grid frequency {'reached' if frequency == threshold else 'is below'} {min_or_max.upper()}-threshold ({'<=' if min_or_max.lower() == 'min' else '>='} {threshold}Hz)"
+    logger.info(f"[EVENT] {msg}")
+    if config.enable_ntfy:
+        try:
+            ntfy.send_notification(
+                title=f"{'REACHED' if frequency == threshold else 'BELOW'} {level.upper()} {min_or_max.upper()}-THRESHOLD",
+                message=f"{msg}\n\n> Frequency={frequency}\n> Timestamp={timestamp}",
+                priority="urgent",
+                tags="rotating_light" if level.upper() == "CRITICAL" else "warning"
+            )
+        except NTFYError:
+            logger.exception("Couldn't send alert to NTFY-instance!")
+            return False
+    
+    return True
+
 def check_frequency_thresholds(frequency:float, timestamp:str, ntfy:None|NTFYHandler) -> None:
     """
-    Check and send alert if MIN-Hz or MAX-Hz frequency threshold has been reached and NTFY is enabled.
+    Check if MIN-Hz or MAX-Hz WARNING/CRITICAL frequency thresholds have been reached.
     """
-    if frequency <= config.min_hz_alert_threshold:
-        _tr:float = config.min_hz_alert_threshold
-        msg:str = f"Grid frequency {'reached' if frequency == _tr else 'is below'} MIN-threshold (<= {_tr}Hz)"
-        logger.info(f"[EVENT] {msg}")
-        if config.enable_ntfy:
-            ntfy.send_notification(
-                title=f"{'REACHED' if frequency == _tr else 'BELOW'} MIN-THRESHOLD",
-                message=f"{msg}\n\n> Frequency={frequency}\n> Timestamp={timestamp}",
-                priority="urgent",
-                tags="warning"
-            )
+    #
+    # CRITICAL
+    #
+    if frequency <= config.critical_min_hz_alert_threshold:
+        if not send_alert(
+                level="CRITICAL",
+                min_or_max="MIN",
+                frequency=frequency,
+                threshold=config.critical_min_hz_alert_threshold,
+                timestamp=timestamp,
+                ntfy=ntfy
+            ):
+            logger.critical("Couldn't send alert!")
+            quit(1)
     
-    elif frequency >= config.max_hz_alert_threshold:
-        _tr:float = config.max_hz_alert_threshold
-        msg:str = f"Grid frequency {'reached' if frequency == _tr else 'is above'} MAX-threshold (>= {_tr}Hz)"
-        logger.info(f"[EVENT] {msg}")
-        if config.enable_ntfy:
-            ntfy.send_notification(
-                title=f"{'REACHED' if frequency == _tr else 'ABOVE'} MAX-THRESHOLD",
-                message=f"{msg}\n\n> Frequency={frequency}\n> Timestamp={timestamp}",
-                priority="urgent",
-                tags="warning"
-            )
+    elif frequency >= config.critical_max_hz_alert_threshold:
+        if not send_alert(
+                level="CRITICAL",
+                min_or_max="MAX",
+                frequency=frequency,
+                threshold=config.critical_max_hz_alert_threshold,
+                timestamp=timestamp,
+                ntfy=ntfy
+            ):
+            logger.critical("Couldn't send alert!")
+            quit(1)
+    
+    #
+    # WARNING
+    #
+    elif frequency <= config.warning_min_hz_alert_threshold:
+        if not send_alert(
+                level="WARNING",
+                min_or_max="MIN",
+                frequency=frequency,
+                threshold=config.warning_min_hz_alert_threshold,
+                timestamp=timestamp,
+                ntfy=ntfy
+            ):
+            logger.critical("Couldn't send alert!")
+            quit(1)
+    
+    elif frequency >= config.warning_max_hz_alert_threshold:
+        if not send_alert(
+                level="WARNING",
+                min_or_max="MAX",
+                frequency=frequency,
+                threshold=config.warning_max_hz_alert_threshold,
+                timestamp=timestamp,
+                ntfy=ntfy
+            ):
+            logger.critical("Couldn't send alert!")
+            quit(1)
 
 def main() -> None:
     ntfy = None
