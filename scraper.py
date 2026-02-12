@@ -97,6 +97,22 @@ def check_frequency_thresholds(frequency:float, timestamp:str, ntfy:None|NTFYHan
             quit(1)
 
 def main() -> None:
+    if args.show_alert_thresholds:
+        logger.debug("Show alert thresholds and exit.")
+        thresholds:str = f"""
+        >------------------------------------------<
+        > WARNING <
+        - MIN={config.warning_min_hz_alert_threshold}Hz
+        - MAX={config.warning_max_hz_alert_threshold}Hz
+        
+        > CRITICAL <
+        - MIN={config.critical_min_hz_alert_threshold}Hz
+        - MAX={config.critical_max_hz_alert_threshold}Hz
+        >------------------------------------------<
+        """
+        print(thresholds)
+        quit(0)
+    
     ntfy = None
     if config.enable_ntfy:
         ntfy = NTFYHandler(
@@ -151,6 +167,10 @@ if __name__ == '__main__':
     )
     parser.add_argument(
         '-t', '--test-ntfy', help=f"Test NTFY-configuration by sending a test-notification.",
+        action="store_true"
+    )
+    parser.add_argument(
+        '-s', '--show-alert-thresholds', help=f"Show CRITICAL/WARNING MIN/MAX alert thresholds and exit.",
         action="store_true"
     )
     args:list = parser.parse_args()
