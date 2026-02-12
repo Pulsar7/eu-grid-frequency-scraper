@@ -24,7 +24,21 @@ class APIError(Exception):
     """
     def __init__(self, *args) -> None:
         super().__init__(*args)
+
+class APIRequestError(APIError):
+    """
+    Raise when HTTP-request to the API failed.
+    """
+    def __init__(self, *args) -> None:
+        super().__init__(*args)
         
+class APIParseError(APIError):
+    """
+    Raise when XML-data parsing failed.
+    """
+    def __init__(self, *args) -> None:
+        super().__init__(*args)
+
 class NTFYError(Exception):
     """
     Raise when using NTFY failed.

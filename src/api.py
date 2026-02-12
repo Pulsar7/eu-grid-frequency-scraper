@@ -2,7 +2,7 @@ import logging
 import requests
 import xml.etree.ElementTree as ET
 #
-from src.custom_exceptions import APIError
+from src.custom_exceptions import *
 
 class APIHandler:
     def __init__(self, api_url:str, requests_timeout:int, requests_cert_verify:bool) -> None:
@@ -50,18 +50,18 @@ class APIHandler:
                               f"{len(response.content)} bytes")
         
         except requests.RequestException as _e:
-            raise APIError("API request-error") from _e
+            raise APIRequestError("API request-error") from _e
         
         # Parse XML-data
         try:
             api_data = ET.fromstring(response.content)
         except ET.ParseError as _e:
-            raise APIError("Couldn't parse API XML-data") from _e
+            raise APIParseError("Couldn't parse API XML-data") from _e
         frequency:str|None = api_data.findtext('f')
         timestamp:str|None = api_data.findtext('z')
         if frequency is None or timestamp is None:
             self.logger.debug(f"Received XML-data: {response.content}")
-            raise APIError("API XML-data doesn't contain expected keys")
+            raise APIParseError("API XML-data doesn't contain expected keys")
 
         self.logger.debug(f"Received data from API: {api_data}, "
                             f"parsed frequency={frequency} and timestamp={timestamp} from XML-API data")
@@ -69,7 +69,7 @@ class APIHandler:
         try:
             frequency:float = float(frequency)
         except ValueError as _e:
-            raise APIError("Invalid frequency value") from _e
+            raise APIParseError("Invalid frequency value") from _e
         
         return (frequency, timestamp)
         
