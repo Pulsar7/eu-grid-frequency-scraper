@@ -46,27 +46,13 @@ class NTFYHandler:
                 verify=self.requests_cert_verify,
                 timeout=self.requests_timeout
             )
-            if response.status_code != 200:
-                err_msg:str = f"Got an invalid response code ('{response.status_code}') from NTFY!"
-                if response.status_code == 401:
-                    err_msg += " (Looks like the authentication-token is incorrect)"
-                raise NTFYError(err_msg)
+            response.raise_for_status()
             
             self.logger.debug(f"Sent out alert to '{self.topic_url}' with HTTP-response-code={response.status_code}")
             
             return True
-            
-        except requests.ConnectionError as _e:
-            raise NTFYError("Connection Error!") from _e
-        
-        except requests.ConnectTimeout as _e:
-            err_msg:str = f"Connection Timeout"
-            if self.requests_timeout <= 3:
-                err_msg += " (Your request-timeout may be too low)"
-            raise NTFYError(err_msg) from _e
-
-        except Exception as _e:
-            raise NTFYError("An unexpected error occured") from _e
+        except requests.RequestException as _e:
+            raise NTFYError("NTFY request-error") from _e
         
     def test_config(self) -> bool:
         """
