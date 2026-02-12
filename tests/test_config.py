@@ -19,11 +19,11 @@ def set_default_env(monkeypatch) -> None:
     monkeypatch.setenv("NTFY_AUTH_TOKEN", "abcdefgh")
     monkeypatch.setenv("NTFY_HTTP_REQUEST_TIMEOUT", "10")
     
-    monkeypatch.setenv("WARNING_MIN_HZ_ALERT_THRESHOLD", "1.5")
-    monkeypatch.setenv("WARNING_MAX_HZ_ALERT_THRESHOLD", "2.0")
-    
     monkeypatch.setenv("CRITICAL_MIN_HZ_ALERT_THRESHOLD", "1.0")
     monkeypatch.setenv("CRITICAL_MAX_HZ_ALERT_THRESHOLD", "2.5")
+    
+    monkeypatch.setenv("WARNING_MIN_HZ_ALERT_THRESHOLD", "1.5")
+    monkeypatch.setenv("WARNING_MAX_HZ_ALERT_THRESHOLD", "2.0")
 
     monkeypatch.setenv("API_HTTP_REQUEST_TIMEOUT", "10")
 
@@ -31,20 +31,40 @@ def set_default_env(monkeypatch) -> None:
 # INTEGER below ZERO
 #------------------------------------------------------------------------------------
 
-def test_invalid_http_timeout_below_zero(monkeypatch) -> None:
+def test_invalid_api_http_timeout_below_zero(monkeypatch) -> None:
     """
-    Test invalid `NTFY_HTTP_REQUEST_TIMEOUT` and `API_HTTP_REQUEST_TIMEOUT`
+    Test negative `API_HTTP_REQUEST_TIMEOUT` integer
+    """
+    set_default_env(monkeypatch)
+    #
+    # negative integer
+    monkeypatch.setenv("API_HTTP_REQUEST_TIMEOUT", "-1")
+    #
+    with pytest.raises(InvalidConfigError):
+        config.load_config()
 
-    - negative `int`
+def test_invalid_ntfy_http_timeout_below_zero(monkeypatch) -> None:
+    """
+    Test negative `NTFY_HTTP_REQUEST_TIMEOUT` integer
     """
     set_default_env(monkeypatch)
     #
     # negative integer
     monkeypatch.setenv("NTFY_HTTP_REQUEST_TIMEOUT", "-1")
-    monkeypatch.setenv("API_HTTP_REQUEST_TIMEOUT", "-1")
     #
     with pytest.raises(InvalidConfigError):
         config.load_config()
+        
+def test_invalid_warning_min_hz_threshold_below_zero(monkeypatch) -> None:
+    """
+    Test invalid `WARNING_MIN_HZ_ALERT_THRESHOLD`
+    
+    - negative `int`
+    """
+    set_default_env(monkeypatch)
+    #
+    # negative integer
+    monkeypatch.setenv("WARNING_MIN_HZ_ALERT_THRESHOLD", "-1")
 
 
 #------------------------------------------------------------------------------------
@@ -124,7 +144,7 @@ def test_invalid_critical_min_hz_threshold_string_instead_of_float(monkeypatch) 
 
 
 #------------------------------------------------------------------------------------
-# Invalid CRITICAL-HZ-THRESHOLDs
+# Alert-Threshold MAX-Hz below MIN-Hz
 #------------------------------------------------------------------------------------
 
 def test_invalid_critical_hz_threshold_max_below_min(monkeypatch) -> None:
@@ -138,23 +158,6 @@ def test_invalid_critical_hz_threshold_max_below_min(monkeypatch) -> None:
     #
     with pytest.raises(InvalidMaxMinThresholdError):
         config.load_config()
-        
-def test_invalid_critical_hz_threshold_max_equals_min(monkeypatch) -> None:
-    """
-        `CRITICAL_MAX_HZ_ALERT_THRESHOLD` equals `CRITICAL_MIN_HZ_ALERT_THRESHOLD`
-    """
-    set_default_env(monkeypatch)
-    #
-    monkeypatch.setenv("CRITICAL_MIN_HZ_ALERT_THRESHOLD", "30.33")
-    monkeypatch.setenv("CRITICAL_MAX_HZ_ALERT_THRESHOLD", "30.33")
-    #
-    with pytest.raises(InvalidMaxMinThresholdError):
-        config.load_config()
-
-
-#------------------------------------------------------------------------------------
-# Invalid WARNING-Hz-THRESHOLDs
-#------------------------------------------------------------------------------------
 
 def test_invalid_warning_hz_threshold_max_below_min(monkeypatch) -> None:
     """
@@ -164,6 +167,57 @@ def test_invalid_warning_hz_threshold_max_below_min(monkeypatch) -> None:
     #
     monkeypatch.setenv("WARNING_MIN_HZ_ALERT_THRESHOLD", "30.33")
     monkeypatch.setenv("WARNING_MAX_HZ_ALERT_THRESHOLD", "30.00")
+    #
+    with pytest.raises(InvalidMaxMinThresholdError):
+        config.load_config()
+
+
+#------------------------------------------------------------------------------------
+# WARNING-MIN-Hz below CRITICAL-MIN-Hz 
+#------------------------------------------------------------------------------------
+
+def test_invalid_hz_threshold_min_warning_below_min_critical(monkeypatch) -> None:
+    """
+        `WARNING_MIN_HZ_ALERT_THRESHOLD` below `CRITICAL_MIN_HZ_ALERT_THRESHOLD`
+    """
+    set_default_env(monkeypatch)
+    #
+    monkeypatch.setenv("CRITICAL_MIN_HZ_ALERT_THRESHOLD", "1.5")
+    monkeypatch.setenv("WARNING_MIN_HZ_ALERT_THRESHOLD", "1.0")
+    #
+    with pytest.raises(InvalidMaxMinThresholdError):
+        config.load_config()
+
+
+#------------------------------------------------------------------------------------
+# WARNING-MAX-Hz above CRITICAL-MAX-Hz
+#------------------------------------------------------------------------------------
+
+def test_invalid_hz_threshold_max_warning_above_max_critical(monkeypatch) -> None:
+    """
+        `WARNING_MAX_HZ_ALERT_THRESHOLD` above `CRITICAL_MAX_HZ_ALERT_THRESHOLD`
+    """
+    set_default_env(monkeypatch)
+    #
+    monkeypatch.setenv("WARNING_MAX_HZ_ALERT_THRESHOLD", "2.5")
+    monkeypatch.setenv("CRITICAL_MAX_HZ_ALERT_THRESHOLD", "2.0")
+    #
+    with pytest.raises(InvalidMaxMinThresholdError):
+        config.load_config()
+
+
+#------------------------------------------------------------------------------------
+# Invalid Alert-Hz-Threshold equals
+#------------------------------------------------------------------------------------
+
+def test_invalid_critical_hz_threshold_max_equals_min(monkeypatch) -> None:
+    """
+        `CRITICAL_MAX_HZ_ALERT_THRESHOLD` equals `CRITICAL_MIN_HZ_ALERT_THRESHOLD`
+    """
+    set_default_env(monkeypatch)
+    #
+    monkeypatch.setenv("CRITICAL_MIN_HZ_ALERT_THRESHOLD", "30.33")
+    monkeypatch.setenv("CRITICAL_MAX_HZ_ALERT_THRESHOLD", "30.33")
     #
     with pytest.raises(InvalidMaxMinThresholdError):
         config.load_config()
@@ -186,32 +240,8 @@ def test_invalid_hz_threshold_min_warning_equals_min_critical(monkeypatch) -> No
     """
     set_default_env(monkeypatch)
     #
-    monkeypatch.setenv("CRITICAL_MIN_HZ_ALERT_THRESHOLD", "")
-    monkeypatch.setenv("WARNING_MIN_HZ_ALERT_THRESHOLD", "")
-    #
-    with pytest.raises(InvalidMaxMinThresholdError):
-        config.load_config()
-        
-def test_invalid_hz_threshold_min_warning_below_min_critical(monkeypatch) -> None:
-    """
-        `WARNING_MIN_HZ_ALERT_THRESHOLD` below `CRITICAL_MIN_HZ_ALERT_THRESHOLD`
-    """
-    set_default_env(monkeypatch)
-    #
-    monkeypatch.setenv("CRITICAL_MIN_HZ_ALERT_THRESHOLD", "1.5")
+    monkeypatch.setenv("CRITICAL_MIN_HZ_ALERT_THRESHOLD", "1.0")
     monkeypatch.setenv("WARNING_MIN_HZ_ALERT_THRESHOLD", "1.0")
-    #
-    with pytest.raises(InvalidMaxMinThresholdError):
-        config.load_config()
-
-def test_invalid_hz_threshold_max_warning_above_max_critical(monkeypatch) -> None:
-    """
-        `WARNING_MAX_HZ_ALERT_THRESHOLD` above `CRITICAL_MAX_HZ_ALERT_THRESHOLD`
-    """
-    set_default_env(monkeypatch)
-    #
-    monkeypatch.setenv("WARNING_MAX_HZ_ALERT_THRESHOLD", "2.5")
-    monkeypatch.setenv("CRITICAL_MAX_HZ_ALERT_THRESHOLD", "2.0")
     #
     with pytest.raises(InvalidMaxMinThresholdError):
         config.load_config()

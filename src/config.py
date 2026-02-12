@@ -55,10 +55,17 @@ def load_config() -> Config:
     
     ntfy_http_request_cert_verify:bool = os.getenv('NTFY_HTTP_REQUEST_CERT_VERIFY', 'false').strip().upper() == "TRUE"
     
+    
+    #
+    # Alert
+    #
     try:
         warning_min_hz_alert_threshold:float = float(os.getenv('WARNING_MIN_HZ_ALERT_THRESHOLD', "49.850"))
     except ValueError as _e:
         raise InvalidMaxMinThresholdError("Got an invalid 'WARNING_MIN_HZ_ALERT_THRESHOLD'! Must be a float.") from _e
+    
+    if warning_min_hz_alert_threshold <= 0:
+        raise InvalidMaxMinThresholdError("'WARNING_MIN_HZ_ALERT_THRESHOLD' must not be negative!")
     
     try:
         warning_max_hz_alert_threshold:float = float(os.getenv('WARNING_MAX_HZ_ALERT_THRESHOLD', "50.150"))
@@ -86,6 +93,7 @@ def load_config() -> Config:
 
     if critical_min_hz_alert_threshold >= critical_max_hz_alert_threshold:
         raise InvalidMaxMinThresholdError("'CRITICAL_MIN_HZ_ALERT_THRESHOLD' needs to be lower than 'CRITICAL_MAX_HZ_ALERT_THRESHOLD'!")
+
 
     #
     # API
