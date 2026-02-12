@@ -170,7 +170,7 @@ def test_invalid_warning_hz_threshold_max_below_min(monkeypatch) -> None:
 
 def test_invalid_warning_hz_threshold_max_equals_min(monkeypatch) -> None:
     """
-    - `WARNING_MAX_HZ_ALERT_THRESHOLD` equals `WARNING_MIN_HZ_ALERT_THRESHOLD`
+        `WARNING_MAX_HZ_ALERT_THRESHOLD` equals `WARNING_MIN_HZ_ALERT_THRESHOLD`
     """
     set_default_env(monkeypatch)
     #
@@ -182,7 +182,7 @@ def test_invalid_warning_hz_threshold_max_equals_min(monkeypatch) -> None:
 
 def test_invalid_hz_threshold_min_warning_equals_min_critical(monkeypatch) -> None:
     """
-    - `CRITICAL_MIN_HZ_ALERT_THRESHOLD` equals `WARNING_MIN_HZ_ALERT_THRESHOLD`
+        `CRITICAL_MIN_HZ_ALERT_THRESHOLD` equals `WARNING_MIN_HZ_ALERT_THRESHOLD`
     """
     set_default_env(monkeypatch)
     #
@@ -194,7 +194,7 @@ def test_invalid_hz_threshold_min_warning_equals_min_critical(monkeypatch) -> No
         
 def test_invalid_hz_threshold_min_warning_below_min_critical(monkeypatch) -> None:
     """
-    - `WARNING_MIN_HZ_ALERT_THRESHOLD` below `CRITICAL_MIN_HZ_ALERT_THRESHOLD`
+        `WARNING_MIN_HZ_ALERT_THRESHOLD` below `CRITICAL_MIN_HZ_ALERT_THRESHOLD`
     """
     set_default_env(monkeypatch)
     #
@@ -206,7 +206,7 @@ def test_invalid_hz_threshold_min_warning_below_min_critical(monkeypatch) -> Non
 
 def test_invalid_hz_threshold_max_warning_above_max_critical(monkeypatch) -> None:
     """
-    - `WARNING_MAX_HZ_ALERT_THRESHOLD` above `CRITICAL_MAX_HZ_ALERT_THRESHOLD`
+        `WARNING_MAX_HZ_ALERT_THRESHOLD` above `CRITICAL_MAX_HZ_ALERT_THRESHOLD`
     """
     set_default_env(monkeypatch)
     #
