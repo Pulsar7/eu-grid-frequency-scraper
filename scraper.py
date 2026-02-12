@@ -23,22 +23,26 @@ def check_frequency_thresholds(frequency:float, timestamp:str, ntfy:None|NTFYHan
     Check and send alert if MIN-Hz or MAX-Hz frequency threshold has been reached and NTFY is enabled.
     """
     if frequency <= config.min_hz_alert_threshold:
-        logger.info(f"[EVENT] Grid frequency is below MIN-threshold (< {config.min_hz_alert_threshold}Hz)")
+        _tr:float = config.min_hz_alert_threshold
+        msg:str = f"Grid frequency {'reached' if frequency == _tr else 'is below'} MIN-threshold (<= {_tr}Hz)"
+        logger.info(f"[EVENT] {msg}")
         if config.enable_ntfy:
             ntfy.send_notification(
-                title="FREQUENCY BELOW THRESHOLD",
-                message=f"Grid frequency is below MIN-threshold (< {config.min_hz_alert_threshold}Hz)\n\n> Frequency={frequency}\n> Timestamp={timestamp}",
-                priority="urgent", # max
+                title=f"{'REACHED' if frequency == _tr else 'BELOW'} MIN-THRESHOLD",
+                message=f"{msg}\n\n> Frequency={frequency}\n> Timestamp={timestamp}",
+                priority="urgent",
                 tags="warning"
             )
     
     elif frequency >= config.max_hz_alert_threshold:
-        logger.info(f"[EVENT] Grid frequency is above MAX-threshold (< {config.max_hz_alert_threshold}Hz)")
+        _tr:float = config.max_hz_alert_threshold
+        msg:str = f"Grid frequency {'reached' if frequency == _tr else 'is above'} MAX-threshold (>= {_tr}Hz)"
+        logger.info(f"[EVENT] {msg}")
         if config.enable_ntfy:
             ntfy.send_notification(
-                title="FREQUENCY ABOVE THRESHOLD",
-                message=f"Grid frequency is above MAX-threshold (> {config.max_hz_alert_threshold}Hz)\n\n> Frequency={frequency}\n> Timestamp={timestamp}",
-                priority="urgent", # max
+                title=f"{'REACHED' if frequency == _tr else 'ABOVE'} MAX-THRESHOLD",
+                message=f"{msg}\n\n> Frequency={frequency}\n> Timestamp={timestamp}",
+                priority="urgent",
                 tags="warning"
             )
 
