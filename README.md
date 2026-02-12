@@ -76,6 +76,10 @@ python3 -m venv .venv && source .venv/bin/activate && pip3 install -r requiremen
 
 ## Usage
 
+```BASH
+.venv/bin/python3 scraper.py --help
+```
+
 ### Create systemd-timed-service (*recommended*)
 
 ```BASH
