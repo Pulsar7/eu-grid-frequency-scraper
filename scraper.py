@@ -18,6 +18,28 @@ from src.custom_exceptions import *
 from src.config import load_config, Config
 from src.logger_config import configure_logger
 
+def send_error_alert(title:str, msg:str, ntfy:None|NTFYHandler) -> bool:
+    """
+    Send error alert via NTFY.
+    """
+    if not config.enable_ntfy or not ntfy:
+        logger.warning("Couldn't send error-Alert, because NTFY is disabled!")
+        return False
+    
+    try:
+        ntfy.send_notification(
+            title=f"ERROR - {title}",
+            message=msg,
+            priority="urgent",
+            tags="rotating_light"
+        )
+    except NTFYError:
+        logger.exception("Couldn't send error-alert to NTFY-instance!")
+        return False
+    
+    return True
+    
+
 def send_alert(level:str, min_or_max:str, frequency:float, threshold:float, timestamp:str, ntfy:None|NTFYHandler) -> bool:
     """
     Log and send NTFY alert if NTFY is enabled.
@@ -161,6 +183,13 @@ def main() -> None:
         (frequency, timestamp) = apihandler.get_api_data()
     except APIError:
         logger.exception("Couldn't get frequency and timestamp from API!")
+        if config.enable_ntfy:
+            if not send_error_alert(
+                title="COULDN'T GET FREQUENCY",
+                msg=f"Couldn't get frequency and timestamp from API! Check logs for more info.\n>Current timestamp={utils.get_iso8601_timestamp()}",
+                ntfy=ntfy
+            ):
+                logger.critical("Couldn't send alert!")
         quit(1)
     
     logger.info(f"Frequency={frequency} | Timestamp={timestamp}")

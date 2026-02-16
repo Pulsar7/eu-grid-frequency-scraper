@@ -4,6 +4,9 @@ import logging
 from src.custom_exceptions import NTFYError
 
 class NTFYHandler:
+    """
+    Handles NTFY-API operations.
+    """
     def __init__(self, topic_url:str, auth_token:str, requests_timeout:int, requests_cert_verify:bool) -> None:
         self.logger:logging.Logger = logging.getLogger(__class__.__name__)
         #

@@ -5,6 +5,9 @@ import xml.etree.ElementTree as ET
 from src.custom_exceptions import *
 
 class APIHandler:
+    """
+    Handles Netzfrequenz-API operations.
+    """
     def __init__(self, api_url:str, requests_timeout:int, requests_cert_verify:bool) -> None:
         self.logger:logging.Logger = logging.getLogger(__class__.__name__)
         #
