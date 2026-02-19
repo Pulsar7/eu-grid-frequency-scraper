@@ -6,7 +6,7 @@
 import pytest
 import src.config as config 
 #
-from src.custom_exceptions import *
+from src.exceptions import *
 
 def set_default_env(monkeypatch) -> None:
     """

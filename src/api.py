@@ -2,7 +2,7 @@ import logging
 import requests
 import xml.etree.ElementTree as ET
 #
-from src.custom_exceptions import *
+from src.exceptions import *
 
 class APIHandler:
     """

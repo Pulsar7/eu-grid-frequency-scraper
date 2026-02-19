@@ -6,7 +6,7 @@
 import pytest
 #
 from src.api import APIHandler
-from src.custom_exceptions import *
+from src.exceptions import *
 
 def get_apihandler_obj(api_url:str) -> APIHandler:
     return APIHandler(

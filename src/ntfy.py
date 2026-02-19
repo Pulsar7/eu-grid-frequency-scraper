@@ -1,7 +1,7 @@
 import requests
 import logging
 #
-from src.custom_exceptions import NTFYError
+from src.exceptions import NTFYError
 
 class NTFYHandler:
     """

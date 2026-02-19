@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from dataclasses import dataclass
 #
 from src.utils import get_dotenv_filepath
-from src.custom_exceptions import InvalidConfigError, InvalidMaxMinThresholdError
+from src.exceptions import InvalidConfigError, InvalidMaxMinThresholdError
 
 logger:logging.Logger = logging.getLogger(__name__)
 

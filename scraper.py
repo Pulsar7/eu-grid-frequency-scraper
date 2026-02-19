@@ -14,7 +14,7 @@ import argparse
 import src.utils as utils
 from src.api import APIHandler
 from src.ntfy import NTFYHandler
-from src.custom_exceptions import *
+from src.exceptions import *
 from src.config import load_config, Config
 from src.logger_config import configure_logger
 
