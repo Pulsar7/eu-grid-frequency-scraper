@@ -13,9 +13,9 @@ class InvalidConfigError(ConfigError):
 
 class InvalidMaxMinThresholdError(InvalidConfigError):
     """
-    Raise when given max/min-warning/critical Hz alert-treshold is given.
+    Raise when invalid max/min-warning/critical Hz alert-treshold is given.
     """
-    def __init__(self, *args):
+    def __init__(self, *args) -> None:
         super().__init__(*args)
         
 class APIError(Exception):
