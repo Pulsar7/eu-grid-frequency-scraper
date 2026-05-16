@@ -19,7 +19,6 @@ It sends alert-messages of two different types (**WARNING** or **CRITICAL**) whe
   - [Create systemd-timed-service (*recommended*)](#create-systemd-timed-service-recommended)
 - [Future plans](#future-plans)
 
-
 ## Alert-Thresholds
 
 There are two types of configurable frequency Alert-thresholds:
@@ -51,19 +50,18 @@ There are two types of configurable frequency Alert-thresholds:
 
 | Env value-name | Default value | Description |
 |:---|:--:|:---|
-|`ENABLE_NTFY`|`false`|Whether to enable **NTFY**-alerts.|
 |`NTFY_TOPIC_URL`|`""`|**URL** to the NTFY-topic where the alerts should be sent to. **Required** when `ENABLE_NTFY=true`.|
 |`NTFY_AUTH_TOKEN`|`""`|**Authentication-Token** for the NTFY-topic. **Required** when `ENABLE_NTFY=true`|
-|`NTFY_HTTP_REQUEST_TIMEOUT`|`10`|HTTP-request-**timeout** in **seconds**.|
-|`NTFY_HTTP_REQUEST_CERT_VERIFY`|`false`|Whether to verify the SSL/TLS-Certificate of **NTFY**.|
+|`NTFY_HTTP_REQUESTS_TIMEOUT`|`10`|HTTP-request-**timeout** in **seconds**.|
+|`FREQUENCY_SOURCE_HTTP_REQUESTS_TLS_VERIFY`|`true`|Whether to verify the SSL/TLS-Certificate of **NTFY**.|
 
 ## Netzfrequenz-API
 
 | Env value-name | Default value | Description |
 |:---|:--:|:---|
-|`NETZFREQUENZ_DE_API_URL`|`""`|**URL** to the [netzfrequenzmessung.de](https://www.netzfrequenzmessung.de/)-API.|
-|`API_HTTP_REQUEST_TIMEOUT`|`10`|HTTP-request-**timeout** in **seconds**.|
-|`API_HTTP_REQUEST_CERT_VERIFY`|`true`|Whether to verify the SSL/TLS-Certificate of the **API**-URL.|
+|`FREQUENCY_SOURCE_URL`|`""`|**URL** to the [netzfrequenzmessung.de](https://www.netzfrequenzmessung.de/)-API.|
+|`FREQUENCY_SOURCE_HTTP_REQUESTS_TIMEOUT`|`10`|HTTP-request-**timeout** in **seconds**.|
+|`FREQUENCY_SOURCE_HTTP_REQUESTS_TLS_VERIFY`|`true`|Whether to verify the SSL/TLS-Certificate of the **API**-URL.|
 
 ## Installation
 
@@ -76,7 +74,7 @@ python3 -m venv .venv && source .venv/bin/activate && pip3 install -r requiremen
 ## Usage
 
 ```BASH
-.venv/bin/python3 scraper.py --help
+.venv/bin/python3 frequency-scraper.py --help
 ```
 
 ### Create systemd-timed-service (*recommended*)
@@ -92,7 +90,7 @@ Type=simple
 User=my-user
 Group=my-user
 WorkingDirectory=/home/my-user/eu-grid-frequency-scraper
-ExecStart=/home/my-user/eu-grid-frequency-scraper/.venv/bin/python /home/my-user/eu-grid-frequency-scraper/scraper.py -l info
+ExecStart=/home/my-user/eu-grid-frequency-scraper/.venv/bin/python /home/my-user/eu-grid-frequency-scraper/frequency-scraper.py -l info
 Restart=no
 StandardOutput=journal
 StandardError=journal
