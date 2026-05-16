@@ -1,4 +1,4 @@
-<h1>eu-grid-frequency-scraper</h1>
+# eu-grid-frequency-scraper <!-- omit in toc -->
 
 > [!IMPORTANT]
 > The script only uses one source of information.
@@ -6,9 +6,8 @@
 A simple Python script, that scrapes the current frequency of the **EU-Grid** from this **API**: [https://dat.netzfrequenzmessung.de:9080/frequenz.xml](https://dat.netzfrequenzmessung.de:9080/frequenz.xml).
 It sends alert-messages of two different types (**WARNING** or **CRITICAL**) when the parsed frequency has been reached or exceeded the configured thresholds.
 
-## Table of contents
+## Table of contents <!-- omit in toc -->
 
-- [Table of contents](#table-of-contents)
 - [Alert-Thresholds](#alert-thresholds)
   - [WARNING Alert-Threshold](#warning-alert-threshold)
   - [CRITICAL Alert-Threshold](#critical-alert-threshold)

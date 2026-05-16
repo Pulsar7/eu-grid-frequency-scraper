@@ -1,4 +1,0 @@
-[tool.pytest.ini_options]
-#
-# To avoid errors like: `ModuleNotFoundError: No module named 'src'`
-pythonpath = ["."]
