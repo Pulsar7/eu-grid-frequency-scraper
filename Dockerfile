@@ -29,4 +29,4 @@ USER ${APP_USER}
 
 # Use tini as entrypoint to forward signals; run scraper in foreground
 ENTRYPOINT ["/usr/local/bin/tini", "--"]
-CMD ["python", "./scraper.py"]
+CMD ["python", "./frequency-scraper.py"]
