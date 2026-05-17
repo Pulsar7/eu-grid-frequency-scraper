@@ -59,9 +59,9 @@ There are two types of configurable frequency Alert-thresholds:
 
 | Env value-name | Default value | Description |
 |:---|:--:|:---|
-|`FREQUENCY_SOURCE_URL`|`""`|**URL** to the [netzfrequenzmessung.de](https://www.netzfrequenzmessung.de/)-Website.|
-|`FREQUENCY_SOURCE_HTTP_REQUESTS_TIMEOUT`|`10`|HTTP-request-**timeout** in **seconds**.|
-|`FREQUENCY_SOURCE_HTTP_REQUESTS_TLS_VERIFY`|`true`|Whether to verify the SSL/TLS-Certificate of the **Frequency-Source-Website**-URL.|
+|`DATA_SOURCE_API_URL`|`""`|**URL** to the [netzfrequenzmessung.de](https://www.netzfrequenzmessung.de/)-Website.|
+|`DATA_SOURCE_API_HTTP_REQUESTS_TIMEOUT`|`10`|HTTP-request-**timeout** in **seconds**.|
+|`DATA_SOURCE_API_HTTP_REQUESTS_TLS_VERIFY`|`true`|Whether to verify the SSL/TLS-Certificate of the **Data-Source-API**-URL.|
 
 ## Installation
 
@@ -116,3 +116,4 @@ WantedBy=timers.target
 - [ ] Add **time-values**-database (e.g. **influxdb**)
   - [ ] Store parsed **frequency** and **timestamp** in db
   - [ ] Send (low priority) alert at the end of the day about lowest & highest 'measured' frequency
+- [ ] Move away from **pip**-package manager?
