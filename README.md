@@ -46,7 +46,7 @@ There are two types of configurable frequency Alert-thresholds:
 >
 > [NTFY](https://ntfy.sh/) is a simple HTTP-based pub-sub notification service.
 > 
-> It can be self-hosted: [https://github.com/binwiederhier/ntfy](https://github.com/binwiederhier/ntfy)
+> See: [https://github.com/binwiederhier/ntfy](https://github.com/binwiederhier/ntfy)
 
 | Env value-name | Default value | Description |
 |:---|:--:|:---|
