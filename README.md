@@ -59,7 +59,7 @@ There are two types of configurable frequency Alert-thresholds:
 
 | Env value-name | Default value | Description |
 |:---|:--:|:---|
-|`DATA_SOURCE_API_URL`|`""`|**URL** to the [netzfrequenzmessung.de](https://www.netzfrequenzmessung.de/)-Website.|
+|`DATA_SOURCE_API_URL`|`"https://dat.netzfrequenzmessung.de:9080/frequenz.xml"`|**URL** to the [netzfrequenzmessung.de](https://www.netzfrequenzmessung.de/)-Website.|
 |`DATA_SOURCE_API_HTTP_REQUESTS_TIMEOUT`|`10`|HTTP-request-**timeout** in **seconds**.|
 |`DATA_SOURCE_API_HTTP_REQUESTS_TLS_VERIFY`|`true`|Whether to verify the SSL/TLS-Certificate of the **Data-Source-API**-URL.|
 
