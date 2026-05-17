@@ -42,9 +42,9 @@ class Config:
     ntfy_http_requests_timeout:int
     ntfy_http_requests_tls_verify:bool
     #
-    frequency_source_url:str
-    frequency_source_http_requests_timeout:int
-    frequency_source_http_requests_tls_verify:bool
+    data_source_api_url:str
+    data_source_api_http_requests_timeout:int
+    data_source_api_http_requests_tls_verify:bool
     #
     warning_min_hz_alert_threshold: float
     warning_max_hz_alert_threshold: float
@@ -87,19 +87,19 @@ def load_config(dotenv_filepath:Path) -> Config:
 
     ntfy_http_requests_tls_verify:bool = True if os.getenv('NTFY_HTTP_REQUESTS_TLS_VERIFY', 'true').lower() == "true" else False
 
-    frequency_source_url:str = os.getenv('FREQUENCY_SOURCE_URL', 'https://dat.netzfrequenzmessung.de:9080/frequenz.xml')
-    if not http_utils.is_valid_frequency_source_url(url=frequency_source_url):
-        raise InvalidConfigError("The provided 'FREQUENCY_SOURCE_URL' is invalid!")
+    data_source_api_url:str = os.getenv('DATA_SOURCE_API_URL', 'https://dat.netzfrequenzmessung.de:9080/frequenz.xml')
+    if not http_utils.is_valid_data_source_api_url(url=data_source_api_url):
+        raise InvalidConfigError("The provided 'DATA_SOURCE_API_URL' is invalid!")
     
-    frequency_source_http_requests_timeout_string:str = os.getenv('FREQUENCY_SOURCE_HTTP_REQUESTS_TIMEOUT', '10')
+    data_source_api_http_requests_timeout_string:str = os.getenv('DATA_SOURCE_API_HTTP_REQUESTS_TIMEOUT', '10')
     try:
-        frequency_source_http_requests_timeout:int = int(frequency_source_http_requests_timeout_string)
-        if frequency_source_http_requests_timeout <= 0:
-            raise ValueError("The 'FREQUENCY_SOURCE_HTTP_REQUESTS_TIMEOUT' is cannot be below 1")
+        data_source_api_http_requests_timeout:int = int(data_source_api_http_requests_timeout_string)
+        if data_source_api_http_requests_timeout <= 0:
+            raise ValueError("The 'DATA_SOURCE_API_HTTP_REQUESTS_TIMEOUT' is cannot be below 1")
     except (TypeError, ValueError) as _e:
-        raise InvalidConfigError("The 'FREQUENCY_SOURCE_HTTP_REQUESTS_TIMEOUT' needs to be a valid integer greater than 0") from _e
+        raise InvalidConfigError("The 'DATA_SOURCE_API_HTTP_REQUESTS_TIMEOUT' needs to be a valid integer greater than 0") from _e
 
-    frequency_source_http_requests_tls_verify:bool = True if os.getenv('FREQUENCY_SOURCE_HTTP_REQUESTS_TLS_VERIFY', 'true').lower() == "true" else False
+    data_source_api_http_requests_tls_verify:bool = True if os.getenv('DATA_SOURCE_API_HTTP_REQUESTS_TLS_VERIFY', 'true').lower() == "true" else False
 
     warning_min_hz_alert_threshold_string:str = os.getenv('WARNING_MIN_HZ_ALERT_THRESHOLD', '49.850')
     try:
@@ -147,9 +147,9 @@ def load_config(dotenv_filepath:Path) -> Config:
         ntfy_auth_token=ntfy_auth_token,
         ntfy_http_requests_timeout=ntfy_http_requests_timeout,
         ntfy_http_requests_tls_verify=ntfy_http_requests_tls_verify,
-        frequency_source_url=frequency_source_url,
-        frequency_source_http_requests_timeout=frequency_source_http_requests_timeout,
-        frequency_source_http_requests_tls_verify=frequency_source_http_requests_tls_verify,
+        data_source_api_url=data_source_api_url,
+        data_source_api_http_requests_timeout=data_source_api_http_requests_timeout,
+        data_source_api_http_requests_tls_verify=data_source_api_http_requests_tls_verify,
         warning_min_hz_alert_threshold=warning_min_hz_alert_threshold,
         warning_max_hz_alert_threshold=warning_max_hz_alert_threshold,
         critical_min_hz_alert_threshold=critical_min_hz_alert_threshold,

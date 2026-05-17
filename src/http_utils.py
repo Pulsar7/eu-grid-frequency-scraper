@@ -2,9 +2,9 @@ import logging
 
 logger:logging.Logger = logging.getLogger(__name__)
 
-def is_valid_frequency_source_url(url:str) -> bool:
+def is_valid_data_source_api_url(url:str) -> bool:
     """
-    Check whether the provided URL can be a valid frequency-source-URL for this Script or not
+    Check whether the provided URL can be a valid data-source-API-URL for this Script or not
     """
     if not url:
         logger.error("Provied an empty URL!")

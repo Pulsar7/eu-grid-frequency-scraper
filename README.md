@@ -50,18 +50,18 @@ There are two types of configurable frequency Alert-thresholds:
 
 | Env value-name | Default value | Description |
 |:---|:--:|:---|
-|`NTFY_TOPIC_URL`|`""`|**URL** to the NTFY-topic where the alerts should be sent to. **Required** when `ENABLE_NTFY=true`.|
-|`NTFY_AUTH_TOKEN`|`""`|**Authentication-Token** for the NTFY-topic. **Required** when `ENABLE_NTFY=true`|
-|`NTFY_HTTP_REQUESTS_TIMEOUT`|`10`|HTTP-request-**timeout** in **seconds**.|
-|`FREQUENCY_SOURCE_HTTP_REQUESTS_TLS_VERIFY`|`true`|Whether to verify the SSL/TLS-Certificate of **NTFY**.|
+|`NTFY_TOPIC_URL`|`""`|**URL** to the NTFY-topic where the alerts should be sent to|
+|`NTFY_AUTH_TOKEN`|`""`|**Authentication-Token** for the NTFY-topic|
+|`NTFY_HTTP_REQUESTS_TIMEOUT`|`10`|HTTP-request-**timeout** in **seconds**|
+|`NTFY_HTTP_REQUESTS_TLS_VERIFY`|`true`|Whether to verify the SSL/TLS-Certificate of the **NTFY**-Topic-URL|
 
 ## Netzfrequenz-API
 
 | Env value-name | Default value | Description |
 |:---|:--:|:---|
-|`FREQUENCY_SOURCE_URL`|`""`|**URL** to the [netzfrequenzmessung.de](https://www.netzfrequenzmessung.de/)-API.|
+|`FREQUENCY_SOURCE_URL`|`""`|**URL** to the [netzfrequenzmessung.de](https://www.netzfrequenzmessung.de/)-Website.|
 |`FREQUENCY_SOURCE_HTTP_REQUESTS_TIMEOUT`|`10`|HTTP-request-**timeout** in **seconds**.|
-|`FREQUENCY_SOURCE_HTTP_REQUESTS_TLS_VERIFY`|`true`|Whether to verify the SSL/TLS-Certificate of the **API**-URL.|
+|`FREQUENCY_SOURCE_HTTP_REQUESTS_TLS_VERIFY`|`true`|Whether to verify the SSL/TLS-Certificate of the **Frequency-Source-Website**-URL.|
 
 ## Installation
 
